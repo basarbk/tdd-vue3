@@ -232,14 +232,18 @@ describe('Sign Up', () => {
         })
       })
 
-      describe('when username is invalid', () => {
-        it('displays validation error', async () => {
+      describe.each([
+        { field: 'username', message: 'Username cannot be null' },
+        { field: 'email', message: 'E-mail cannot be null' },
+        { field: 'password', message: 'Password cannot be null' }
+      ])('when $field is invalid', ({ field, message }) => {
+        it(`displays ${message}`, async () => {
           server.use(
             http.post('/api/v1/users', () => {
               return HttpResponse.json(
                 {
                   validationErrors: {
-                    username: 'Username cannot be null'
+                    [field]: message
                   }
                 },
                 { status: 400 }
@@ -251,7 +255,7 @@ describe('Sign Up', () => {
             elements: { button }
           } = await setup()
           await user.click(button)
-          const error = await screen.findByText('Username cannot be null')
+          const error = await screen.findByText(message)
           expect(error).toBeInTheDocument()
         })
       })

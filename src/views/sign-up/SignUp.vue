@@ -11,14 +11,14 @@
           :help="errors.username"
           v-model="formState.username"
         />
-        <div class="mb-3">
-          <label class="form-label" for="email">E-mail</label>
-          <input class="form-control" id="email" v-model="formState.email" />
-        </div>
-        <div class="mb-3">
-          <label class="form-label" for="password">Password</label>
-          <input class="form-control" id="password" type="password" v-model="formState.password" />
-        </div>
+        <AppInput id="email" label="E-mail" :help="errors.email" v-model="formState.email" />
+        <AppInput
+          id="password"
+          label="Password"
+          :help="errors.password"
+          v-model="formState.password"
+          type="password"
+        />
         <div class="mb-3">
           <label class="form-label" for="passwordRepeat">Password Repeat</label>
           <input

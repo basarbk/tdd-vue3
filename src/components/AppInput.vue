@@ -6,6 +6,7 @@
       :class="{ 'is-invalid': help }"
       :id="id"
       @input="$emit('update:modelValue', $event.target.value)"
+      :type="type"
     />
     <span class="invalid-feedback">{{ help }}</span>
   </div>
@@ -15,7 +16,8 @@ defineProps({
   label: String,
   id: String,
   help: String,
-  modelValue: String
+  modelValue: String,
+  type: String
 })
 defineEmits(['update:modelValue'])
 </script>
@@ -25,7 +27,8 @@ export default {
     label: String,
     id: String,
     help: String,
-    modelValue: String
+    modelValue: String,
+    type: String
   },
   emits: ['update:modelValue']
 }
