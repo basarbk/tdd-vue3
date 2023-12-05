@@ -172,6 +172,65 @@ describe('Sign Up', () => {
           })
         })
       })
+
+      describe('when network failure occurs', () => {
+        it('displays generic message', async () => {
+          server.use(
+            http.post('/api/v1/users', () => {
+              return HttpResponse.error()
+            })
+          )
+          const {
+            user,
+            elements: { button }
+          } = await setup()
+          await user.click(button)
+          const text = await screen.findByText('Unexpected error occurred, please try again')
+          expect(text).toBeInTheDocument()
+        })
+
+        it('hides spinner', async () => {
+          server.use(
+            http.post('/api/v1/users', () => {
+              return HttpResponse.error()
+            })
+          )
+          const {
+            user,
+            elements: { button }
+          } = await setup()
+          await user.click(button)
+          await waitFor(() => {
+            expect(screen.queryByRole('status')).not.toBeInTheDocument()
+          })
+        })
+
+        describe('when user submits again', () => {
+          it('hides error when api request is progress', async () => {
+            let processedFirstRequest = false
+            server.use(
+              http.post('/api/v1/users', () => {
+                if (!processedFirstRequest) {
+                  processedFirstRequest = true
+                  return HttpResponse.error()
+                } else {
+                  return HttpResponse.json({})
+                }
+              })
+            )
+            const {
+              user,
+              elements: { button }
+            } = await setup()
+            await user.click(button)
+            const text = await screen.findByText('Unexpected error occurred, please try again')
+            await user.click(button)
+            await waitFor(() => {
+              expect(text).not.toBeInTheDocument()
+            })
+          })
+        })
+      })
     })
   })
 })

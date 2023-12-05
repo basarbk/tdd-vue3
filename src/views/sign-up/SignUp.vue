@@ -26,6 +26,7 @@
             v-model="formState.passwordRepeat"
           />
         </div>
+        <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
         <div class="text-center">
           <button class="btn btn-primary" :disabled="isDisabled || apiProgress">
             <span v-if="apiProgress" role="status" class="spinner-border spinner-border-sm"></span>
@@ -49,12 +50,20 @@ const formState = reactive({
 
 const apiProgress = ref(false)
 const successMessage = ref()
+const errorMessage = ref()
 
 const submit = async () => {
   apiProgress.value = true
+  errorMessage.value = undefined
   const { passwordRepeat, ...body } = formState
-  const response = await axios.post('/api/v1/users', body)
-  successMessage.value = response.data.message
+  try {
+    const response = await axios.post('/api/v1/users', body)
+    successMessage.value = response.data.message
+  } catch {
+    errorMessage.value = 'Unexpected error occurred, please try again'
+  } finally {
+    apiProgress.value = false
+  }
 }
 
 const isDisabled = computed(() => {
@@ -76,15 +85,23 @@ export default {
         passwordRepeat: ''
       },
       apiProgress: false,
-      successMessage: undefined
+      successMessage: undefined,
+      errorMessage: undefined
     }
   },
   methods: {
     async submit() {
       this.apiProgress = true
+      this.errorMessage = undefined
       const { passwordRepeat, ...body } = this.formState
-      const response = await axios.post('/api/v1/users', body)
-      this.successMessage = response.data.message
+      try {
+        const response = await axios.post('/api/v1/users', body)
+        this.successMessage = response.data.message
+      } catch {
+        this.errorMessage = 'Unexpected error occurred, please try again'
+      } finally {
+        this.apiProgress = false
+      }
     }
   },
   computed: {

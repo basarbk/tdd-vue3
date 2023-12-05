@@ -47,7 +47,9 @@ describe('Sign Up', () => {
       })
       describe('when there is an ongoing api call', () => {
         it('does not allow clicking the button', async () => {
-          axios.post.mockResolvedValue({ data: {} })
+          axios.post.mockImplementation(
+            () => new Promise((resolve) => setTimeout(() => resolve({ data: {} }), 1000))
+          )
           const {
             user,
             elements: { button }
