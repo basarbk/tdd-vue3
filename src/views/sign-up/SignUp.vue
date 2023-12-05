@@ -19,15 +19,13 @@
           v-model="formState.password"
           type="password"
         />
-        <div class="mb-3">
-          <label class="form-label" for="passwordRepeat">Password Repeat</label>
-          <input
-            class="form-control"
+        <AppInput
             id="passwordRepeat"
+          label="Password Repeat"
+          :help="passwordMismatchError"
+          v-model="formState.passwordRepeat"
             type="password"
-            v-model="formState.passwordRepeat"
           />
-        </div>
         <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
         <div class="text-center">
           <button class="btn btn-primary" :disabled="isDisabled || apiProgress">
@@ -79,6 +77,10 @@ const isDisabled = computed(() => {
     ? formState.password !== formState.passwordRepeat
     : true
 })
+const passwordMismatchError = computed(() => {
+  return formState.password !== formState.passwordRepeat ? 'Password mismatch' : undefined
+})
+
 </script>
 <!-- <script>
 import axios from 'axios'
@@ -126,6 +128,12 @@ export default {
       return this.formState.password || this.formState.passwordRepeat
         ? this.formState.password !== this.formState.passwordRepeat
         : true
+    },
+    passwordMismatchError() {
+      return this.formState.password !== this.formState.passwordRepeat
+        ? 'Password mismatch'
+        : undefined
+    }
     }
   }
 }
