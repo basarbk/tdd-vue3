@@ -1,22 +1,24 @@
 <template>
-  <h1>Sign Up</h1>
-  <div>
-    <label for="username">Username</label>
-    <input id="username" v-model="formState.username" />
-  </div>
-  <div>
-    <label for="email">E-mail</label>
-    <input id="email" v-model="formState.email" />
-  </div>
-  <div>
-    <label for="password">Password</label>
-    <input id="password" type="password" v-model="formState.password" />
-  </div>
-  <div>
-    <label for="passwordRepeat">Password Repeat</label>
-    <input id="passwordRepeat" type="password" v-model="formState.passwordRepeat" />
-  </div>
-  <button :disabled="isDisabled" @click="submit">Sign Up</button>
+  <form @submit.prevent="submit">
+    <h1>Sign Up</h1>
+    <div>
+      <label for="username">Username</label>
+      <input id="username" v-model="formState.username" />
+    </div>
+    <div>
+      <label for="email">E-mail</label>
+      <input id="email" v-model="formState.email" />
+    </div>
+    <div>
+      <label for="password">Password</label>
+      <input id="password" type="password" v-model="formState.password" />
+    </div>
+    <div>
+      <label for="passwordRepeat">Password Repeat</label>
+      <input id="passwordRepeat" type="password" v-model="formState.passwordRepeat" />
+    </div>
+    <button :disabled="isDisabled">Sign Up</button>
+  </form>
 </template>
 <script setup>
 import axios from 'axios'
