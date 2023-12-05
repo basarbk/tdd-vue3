@@ -1,8 +1,13 @@
 <template>
   <div class="mb-3">
     <label class="form-label" :for="id">{{ label }}</label>
-    <input class="form-control" :id="id" @input="$emit('update:modelValue', $event.target.value)" />
-    <span>{{ help }}</span>
+    <input
+      class="form-control"
+      :class="{ 'is-invalid': help }"
+      :id="id"
+      @input="$emit('update:modelValue', $event.target.value)"
+    />
+    <span class="invalid-feedback">{{ help }}</span>
   </div>
 </template>
 <script setup>
