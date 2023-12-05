@@ -20,12 +20,12 @@
           type="password"
         />
         <AppInput
-            id="passwordRepeat"
+          id="passwordRepeat"
           label="Password Repeat"
           :help="passwordMismatchError"
           v-model="formState.passwordRepeat"
-            type="password"
-          />
+          type="password"
+        />
         <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
         <div class="text-center">
           <button class="btn btn-primary" :disabled="isDisabled || apiProgress">
@@ -40,7 +40,7 @@
 </template>
 <script setup>
 import axios from 'axios'
-import { reactive, computed, ref } from 'vue'
+import { reactive, computed, ref, watch } from 'vue'
 import { AppInput } from '@/components'
 const formState = reactive({
   username: '',
@@ -81,6 +81,25 @@ const passwordMismatchError = computed(() => {
   return formState.password !== formState.passwordRepeat ? 'Password mismatch' : undefined
 })
 
+watch(
+  () => formState.username,
+  () => {
+    delete errors.value.username
+  }
+)
+watch(
+  () => formState.email,
+  () => {
+    delete errors.value.email
+  }
+)
+
+watch(
+  () => formState.password,
+  () => {
+    delete errors.value.password
+  }
+)
 </script>
 <!-- <script>
 import axios from 'axios'
@@ -134,6 +153,16 @@ export default {
         ? 'Password mismatch'
         : undefined
     }
+  },
+  watch: {
+    'formState.username'() {
+      delete this.errors.username
+    },
+    'formState.email'() {
+      delete this.errors.email
+    },
+    'formState.password'() {
+      delete this.errors.password
     }
   }
 }
