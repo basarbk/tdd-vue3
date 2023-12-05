@@ -34,6 +34,7 @@
         </div>
       </div>
     </form>
+    <div v-if="successMessage" class="alert alert-success">{{ successMessage }}</div>
   </div>
 </template>
 <script setup>
@@ -47,11 +48,13 @@ const formState = reactive({
 })
 
 const apiProgress = ref(false)
+const successMessage = ref()
 
-const submit = () => {
+const submit = async () => {
   apiProgress.value = true
   const { passwordRepeat, ...body } = formState
-  axios.post('/api/v1/users', body)
+  const response = await axios.post('/api/v1/users', body)
+  successMessage.value = response.data.message
 }
 
 const isDisabled = computed(() => {
@@ -72,14 +75,16 @@ export default {
         password: '',
         passwordRepeat: ''
       },
-      apiProgress: false
+      apiProgress: false,
+      successMessage: undefined
     }
   },
   methods: {
-    submit() {
+    async submit() {
       this.apiProgress = true
       const { passwordRepeat, ...body } = this.formState
-      axios.post('/api/v1/users', body)
+      const response = await axios.post('/api/v1/users', body)
+      this.successMessage = response.data.message
     }
   },
   computed: {

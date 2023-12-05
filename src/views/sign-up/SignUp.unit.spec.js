@@ -33,6 +33,7 @@ describe('Sign Up', () => {
   describe('when user sets same value for password inputs', () => {
     describe('when user submits form', () => {
       it('sends username, email, password to the backend', async () => {
+        axios.post.mockResolvedValue({ data: {} })
         const {
           user,
           elements: { button }
@@ -46,6 +47,7 @@ describe('Sign Up', () => {
       })
       describe('when there is an ongoing api call', () => {
         it('does not allow clicking the button', async () => {
+          axios.post.mockResolvedValue({ data: {} })
           const {
             user,
             elements: { button }
