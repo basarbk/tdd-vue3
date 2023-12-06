@@ -1,8 +1,15 @@
 vi.mock('axios')
+vi.mock('vue-i18n')
 import { render, screen, waitFor } from '@testing-library/vue'
 import SignUp from './SignUp.vue'
 import userEvent from '@testing-library/user-event'
 import axios from 'axios'
+import en from '@/locales/translations/en.json'
+import { useI18n } from 'vue-i18n'
+
+vi.mocked(useI18n).mockReturnValue({
+  t: (key) => en[key]
+})
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -10,7 +17,13 @@ beforeEach(() => {
 
 const setup = async () => {
   const user = userEvent.setup()
-  const result = render(SignUp)
+  const result = render(SignUp, {
+    global: {
+      mocks: {
+        $t: (key) => en[key]
+      }
+    }
+  })
   const usernameInput = screen.getByLabelText('Username')
   const emailInput = screen.getByLabelText('E-mail')
   const passwordInput = screen.getByLabelText('Password')

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/vue'
+import { render, screen, waitFor } from 'test/helper'
 import SignUp from './SignUp.vue'
 import userEvent from '@testing-library/user-event'
 import { setupServer } from 'msw/node'
