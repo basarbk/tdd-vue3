@@ -2,26 +2,26 @@
   <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
     <form class="card" @submit.prevent="submit" data-testid="form-sign-up" v-if="!successMessage">
       <div class="card-header text-center">
-        <h1>Sign Up</h1>
+        <h1>{{ $t('signUp') }}</h1>
       </div>
       <div class="card-body">
         <AppInput
           id="username"
-          label="Username"
+          :label="$t('username')"
           :help="errors.username"
           v-model="formState.username"
         />
-        <AppInput id="email" label="E-mail" :help="errors.email" v-model="formState.email" />
+        <AppInput id="email" :label="$t('email')" :help="errors.email" v-model="formState.email" />
         <AppInput
           id="password"
-          label="Password"
+          :label="$t('password')"
           :help="errors.password"
           v-model="formState.password"
           type="password"
         />
         <AppInput
           id="passwordRepeat"
-          label="Password Repeat"
+          :label="$t('passwordRepeat')"
           :help="passwordMismatchError"
           v-model="formState.passwordRepeat"
           type="password"
@@ -30,7 +30,7 @@
         <div class="text-center">
           <button class="btn btn-primary" :disabled="isDisabled || apiProgress">
             <span v-if="apiProgress" role="status" class="spinner-border spinner-border-sm"></span>
-            Sign Up
+            {{ $t('signUp') }}
           </button>
         </div>
       </div>
@@ -42,6 +42,8 @@
 import axios from 'axios'
 import { reactive, computed, ref, watch } from 'vue'
 import { AppInput } from '@/components'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
 const formState = reactive({
   username: '',
   email: '',
@@ -65,7 +67,7 @@ const submit = async () => {
     if (apiError.response?.status === 400) {
       errors.value = apiError.response.data.validationErrors
     } else {
-      errorMessage.value = 'Unexpected error occurred, please try again'
+      errorMessage.value = t('genericError')
     }
   } finally {
     apiProgress.value = false
@@ -78,7 +80,7 @@ const isDisabled = computed(() => {
     : true
 })
 const passwordMismatchError = computed(() => {
-  return formState.password !== formState.passwordRepeat ? 'Password mismatch' : undefined
+  return formState.password !== formState.passwordRepeat ? t('passwordMismatch') : undefined
 })
 
 watch(
@@ -135,7 +137,7 @@ export default {
         if (apiError.response?.status === 400) {
           this.errors = apiError.response.data.validationErrors
         } else {
-          this.errorMessage = 'Unexpected error occurred, please try again'
+          this.errorMessage = this.$t('genericError')
         }
       } finally {
         this.apiProgress = false
@@ -150,7 +152,7 @@ export default {
     },
     passwordMismatchError() {
       return this.formState.password !== this.formState.passwordRepeat
-        ? 'Password mismatch'
+        ? this.$t('passwordMismatch')
         : undefined
     }
   },
