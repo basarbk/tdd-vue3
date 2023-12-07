@@ -38,12 +38,12 @@
     <div v-else class="alert alert-success">{{ successMessage }}</div>
   </div>
 </template>
-<script setup>
-import axios from 'axios'
+<!-- <script setup>
 import { reactive, computed, ref, watch } from 'vue'
 import { AppInput } from '@/components'
 import { useI18n } from 'vue-i18n'
-const { t, locale } = useI18n()
+import { signUp } from './api'
+const { t } = useI18n()
 const formState = reactive({
   username: '',
   email: '',
@@ -61,11 +61,7 @@ const submit = async () => {
   errorMessage.value = undefined
   const { passwordRepeat, ...body } = formState
   try {
-    const response = await axios.post('/api/v1/users', body, {
-      headers: {
-        'Accept-Language': locale.value
-      }
-    })
+    const response = await signUp(body)
     successMessage.value = response.data.message
   } catch (apiError) {
     if (apiError.response?.status === 400) {
@@ -106,10 +102,10 @@ watch(
     delete errors.value.password
   }
 )
-</script>
-<!-- <script>
-import axios from 'axios'
+</script> -->
+<script>
 import { AppInput } from '@/components'
+import { signUp } from './api'
 
 export default {
   components: {
@@ -135,11 +131,7 @@ export default {
       this.errorMessage = undefined
       const { passwordRepeat, ...body } = this.formState
       try {
-        const response = await axios.post('/api/v1/users', body, {
-          headers: {
-            'Accept-Language': this.$i18n.locale
-          }
-        })
+        const response = await signUp(body)
         this.successMessage = response.data.message
       } catch (apiError) {
         if (apiError.response?.status === 400) {
@@ -176,4 +168,4 @@ export default {
     }
   }
 }
-</script> -->
+</script>
