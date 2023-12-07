@@ -26,21 +26,21 @@
           v-model="formState.passwordRepeat"
           type="password"
         />
-        <div v-if="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+        <Alert v-if="errorMessage" variant="danger">{{ errorMessage }}</Alert>
         <div class="text-center">
           <button class="btn btn-primary" :disabled="isDisabled || apiProgress">
-            <span v-if="apiProgress" role="status" class="spinner-border spinner-border-sm"></span>
+            <Spinner v-if="apiProgress" />
             {{ $t('signUp') }}
           </button>
         </div>
       </div>
     </form>
-    <div v-else class="alert alert-success">{{ successMessage }}</div>
+    <Alert v-else>{{ successMessage }}</Alert>
   </div>
 </template>
 <!-- <script setup>
 import { reactive, computed, ref, watch } from 'vue'
-import { AppInput } from '@/components'
+import { Alert, AppInput, Spinner } from '@/components'
 import { useI18n } from 'vue-i18n'
 import { signUp } from './api'
 const { t } = useI18n()
@@ -104,12 +104,14 @@ watch(
 )
 </script> -->
 <script>
-import { AppInput } from '@/components'
+import { Alert, AppInput, Spinner } from '@/components'
 import { signUp } from './api'
 
 export default {
   components: {
-    AppInput
+    AppInput,
+    Alert,
+    Spinner
   },
   data() {
     return {
