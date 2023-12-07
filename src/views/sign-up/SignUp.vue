@@ -1,5 +1,5 @@
 <template>
-  <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
+  <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2" data-testid="signup-page">
     <form class="card" @submit.prevent="submit" data-testid="form-sign-up" v-if="!successMessage">
       <div class="card-header text-center">
         <h1>{{ $t('signUp') }}</h1>
