@@ -10,7 +10,9 @@ const setup = async (path) => {
 describe('Routing', () => {
   describe.each([
     { path: '/', pageId: 'home-page' },
-    { path: '/signup', pageId: 'signup-page' }
+    { path: '/signup', pageId: 'signup-page' },
+    { path: '/activation/123', pageId: 'activation-page' },
+    { path: '/activation/456', pageId: 'activation-page' }
   ])('when path is $path', ({ path, pageId }) => {
     it(`displays ${pageId}`, async () => {
       await setup(path)
