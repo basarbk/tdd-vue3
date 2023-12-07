@@ -43,7 +43,7 @@ import axios from 'axios'
 import { reactive, computed, ref, watch } from 'vue'
 import { AppInput } from '@/components'
 import { useI18n } from 'vue-i18n'
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const formState = reactive({
   username: '',
   email: '',
@@ -61,7 +61,11 @@ const submit = async () => {
   errorMessage.value = undefined
   const { passwordRepeat, ...body } = formState
   try {
-    const response = await axios.post('/api/v1/users', body)
+    const response = await axios.post('/api/v1/users', body, {
+      headers: {
+        'Accept-Language': locale.value
+      }
+    })
     successMessage.value = response.data.message
   } catch (apiError) {
     if (apiError.response?.status === 400) {
@@ -131,7 +135,11 @@ export default {
       this.errorMessage = undefined
       const { passwordRepeat, ...body } = this.formState
       try {
-        const response = await axios.post('/api/v1/users', body)
+        const response = await axios.post('/api/v1/users', body, {
+          headers: {
+            'Accept-Language': this.$i18n.locale
+          }
+        })
         this.successMessage = response.data.message
       } catch (apiError) {
         if (apiError.response?.status === 400) {

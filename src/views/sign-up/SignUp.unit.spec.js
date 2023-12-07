@@ -8,7 +8,10 @@ import en from '@/locales/translations/en.json'
 import { useI18n } from 'vue-i18n'
 
 vi.mocked(useI18n).mockReturnValue({
-  t: (key) => en[key]
+  t: (key) => en[key],
+  locale: {
+    value: 'ab'
+  }
 })
 
 beforeEach(() => {
@@ -20,7 +23,10 @@ const setup = async () => {
   const result = render(SignUp, {
     global: {
       mocks: {
-        $t: (key) => en[key]
+        $t: (key) => en[key],
+        $i18n: {
+          locale: 'ab'
+        }
       }
     }
   })
@@ -56,11 +62,19 @@ describe('Sign Up', () => {
           elements: { button }
         } = await setup()
         await user.click(button)
-        expect(axios.post).toHaveBeenCalledWith('/api/v1/users', {
-          username: 'user1',
-          email: 'user1@mail.com',
-          password: 'P4ssword'
-        })
+        expect(axios.post).toHaveBeenCalledWith(
+          '/api/v1/users',
+          {
+            username: 'user1',
+            email: 'user1@mail.com',
+            password: 'P4ssword'
+          },
+          {
+            headers: {
+              'Accept-Language': 'ab'
+            }
+          }
+        )
       })
       describe('when there is an ongoing api call', () => {
         it('does not allow clicking the button', async () => {
