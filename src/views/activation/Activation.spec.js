@@ -1,4 +1,4 @@
-import { render, waitFor, router } from 'test/helper'
+import { render, waitFor, router, screen } from 'test/helper'
 import { setupServer } from 'msw/node'
 import { HttpResponse, http } from 'msw'
 import { afterAll, beforeAll } from 'vitest'
@@ -59,6 +59,81 @@ describe('Activation', () => {
       await waitFor(() => {
         expect(token).toBe('456')
       })
+    })
+  })
+
+  describe('when network error occurs', () => {
+    it('displays generic error message', async () => {
+      server.use(
+        http.patch('/api/v1/users/:token/active', () => {
+          return HttpResponse.error()
+        })
+      )
+      await setup('/activation/123')
+      const text = await screen.findByText('Unexpected error occurred, please try again')
+      expect(text).toBeInTheDocument()
+    })
+  })
+
+  describe('when token is invalid', () => {
+    it('displays error message received in response', async () => {
+      let resolveFunc
+      const promise = new Promise((resolve) => {
+        resolveFunc = resolve
+      })
+      server.use(
+        http.patch('/api/v1/users/:token/active', async ({}) => {
+          await promise
+          return HttpResponse.json({ message: 'Activation failure' }, { status: 400 })
+        })
+      )
+      await setup('/activation/123')
+      expect(screen.queryByText('Activation failure')).not.toBeInTheDocument()
+      await resolveFunc()
+      await waitFor(() => {
+        expect(screen.queryByText('Activation failure')).toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('when token is valid', () => {
+    it('displays success message received in response', async () => {
+      let resolveFunc
+      const promise = new Promise((resolve) => {
+        resolveFunc = resolve
+      })
+      server.use(
+        http.patch('/api/v1/users/:token/active', async ({}) => {
+          await promise
+          return HttpResponse.json({ message: 'Account is activated' })
+        })
+      )
+      await setup('/activation/123')
+      expect(screen.queryByText('Account is activated')).not.toBeInTheDocument()
+      await resolveFunc()
+      await waitFor(() => {
+        expect(screen.queryByText('Account is activated')).toBeInTheDocument()
+      })
+    })
+  })
+
+  it('displays spinner', async () => {
+    let resolveFunc
+    const promise = new Promise((resolve) => {
+      resolveFunc = resolve
+    })
+    server.use(
+      http.patch('/api/v1/users/:token/active', async ({}) => {
+        await promise
+        return HttpResponse.json({ message: 'Account is activated' })
+      })
+    )
+    await setup('/activation/123')
+    const spinner = await screen.findByRole('status')
+    expect(spinner).toBeInTheDocument()
+    await resolveFunc()
+    await waitFor(() => {
+      expect(spinner).not.toBeInTheDocument()
     })
   })
 })
