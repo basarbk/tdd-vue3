@@ -9,5 +9,10 @@
   "passwordReset": {
     "request": "Reset password",
     "set": "Set password"
+  },
+  "userList": {
+    "header": "Users",
+    "next": "Next",
+    "previous": "Previous"
   }
 }

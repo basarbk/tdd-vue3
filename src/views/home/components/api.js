@@ -1,5 +1,5 @@
 import http from '@/lib/http'
 
-export const loadUsers = () => {
-  return http.get('/api/v1/users', { params: { page: 0, size: 3 } })
+export const loadUsers = (page = 0) => {
+  return http.get('/api/v1/users', { params: { page, size: 3 } })
 }

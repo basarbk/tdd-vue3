@@ -9,5 +9,10 @@
   "passwordReset": {
     "request": "Şifreni sıfırla",
     "set": "Şifreni belirle"
+  },
+  "userList": {
+    "header": "Kullanıclar",
+    "next": "Sonraki",
+    "previous": "Önceki"
   }
 }

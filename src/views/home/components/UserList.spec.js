@@ -82,4 +82,58 @@ describe('UserList', () => {
       expect(screen.queryAllByText(/user/).length).toBe(3)
     })
   })
+
+  it('displays next page button', async () => {
+    render(UserList)
+    await screen.findByText('user1')
+    expect(screen.queryByRole('button', { name: 'Next' })).toBeInTheDocument()
+  })
+
+  it('does not display previous page button', async () => {
+    render(UserList)
+    await screen.findByText('user1')
+    expect(screen.queryByRole('button', { name: 'Previous' })).not.toBeInTheDocument()
+  })
+
+  describe('when user clicks next', () => {
+    it('displays next page', async () => {
+      const { user } = render(UserList)
+      await screen.findByText('user1')
+      await user.click(screen.queryByRole('button', { name: 'Next' }))
+      const firstUserOnPage2 = await screen.findByText('user4')
+      expect(firstUserOnPage2).toBeInTheDocument()
+    })
+
+    it('displays previous page button', async () => {
+      const { user } = render(UserList)
+      await screen.findByText('user1')
+      await user.click(screen.queryByRole('button', { name: 'Next' }))
+      await screen.findByText('user4')
+      expect(screen.queryByRole('button', { name: 'Previous' })).toBeInTheDocument()
+    })
+
+    describe('when user clicks previous', () => {
+      it('displays previous page', async () => {
+        const { user } = render(UserList)
+        await screen.findByText('user1')
+        await user.click(screen.queryByRole('button', { name: 'Next' }))
+        await screen.findByText('user4')
+        await user.click(screen.queryByRole('button', { name: 'Previous' }))
+        const firstUserOnPage1 = await screen.findByText('user1')
+        expect(firstUserOnPage1).toBeInTheDocument()
+      })
+    })
+
+    describe('when last page is loaded', () => {
+      it('does not display next page button', async () => {
+        const { user } = render(UserList)
+        await screen.findByText('user1')
+        await user.click(screen.queryByRole('button', { name: 'Next' }))
+        await screen.findByText('user4')
+        await user.click(screen.queryByRole('button', { name: 'Next' }))
+        await screen.findByText('user7')
+        expect(screen.queryByRole('button', { name: 'Next' })).not.toBeInTheDocument()
+      })
+    })
+  })
 })
