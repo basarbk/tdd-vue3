@@ -8,7 +8,8 @@
   "genericError": "Beklenmedik bir hata oluştu, lütfen tekrar deneyin",
   "passwordReset": {
     "request": "Şifreni sıfırla",
-    "set": "Şifreni belirle"
+    "set": "Şifreni belirle",
+    "forgot": "Şifreni mi unuttun?"
   },
   "userList": {
     "header": "Kullanıclar",

@@ -21,7 +21,6 @@
             type="password"
           />
           <Alert v-if="errorMessage" variant="danger">{{ errorMessage }}</Alert>
-          <Alert v-if="successMessage">{{ successMessage }}</Alert>
           <div class="text-center">
             <AppButton :is-disabled="isDisabled" :api-progress="apiProgress">
               {{ $t('passwordReset.set') }}
@@ -37,14 +36,14 @@ import { AppInput, Alert, AppButton, Card } from '@/components'
 import { computed, ref, watch } from 'vue'
 import { passwordSet } from './api'
 import { useI18n } from 'vue-i18n'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 const { t } = useI18n()
 const route = useRoute()
+const router = useRouter()
 
 const password = ref('')
 const passwordRepeat = ref('')
 const apiProgress = ref(false)
-const successMessage = ref()
 const errorMessage = ref()
 const errors = ref({})
 
@@ -52,8 +51,8 @@ const submit = async () => {
   apiProgress.value = true
   errorMessage.value = undefined
   try {
-    const response = await passwordSet(route.query.tk, { password: password.value })
-    successMessage.value = response.data.message
+    await passwordSet(route.query.tk, { password: password.value })
+    router.push('/login')
   } catch (apiError) {
     if (apiError.response?.data?.validationErrors) {
       errors.value = apiError.response.data.validationErrors

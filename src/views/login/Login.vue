@@ -26,6 +26,9 @@
             </AppButton>
           </div>
         </template>
+        <template v-slot:footer>
+          <router-link to="/password-reset/request">{{ $t('passwordReset.forgot') }}</router-link>
+        </template>
       </Card>
     </form>
   </div>
