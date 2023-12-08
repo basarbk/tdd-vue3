@@ -7,6 +7,7 @@
   "passwordMismatch": "Şifreniz eşleşmedi",
   "genericError": "Beklenmedik bir hata oluştu, lütfen tekrar deneyin",
   "passwordReset": {
-    "request": "Şifreni sıfırla"
+    "request": "Şifreni sıfırla",
+    "set": "Şifreni belirle"
   }
 }
