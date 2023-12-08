@@ -1,12 +1,14 @@
 <template>
-  <div class="card">
-    <div class="card-header text-center">
+  <Card>
+    <template v-slot:header>
       <h3>{{ $t('userList.header') }}</h3>
-    </div>
-    <ul class="list-group list-group-flush">
-      <UserItem v-for="user in pageData.content" :user="user" :key="user.id" />
-    </ul>
-    <div class="card-footer text-center">
+    </template>
+    <template v-slot:default>
+      <ul class="list-group list-group-flush">
+        <UserItem v-for="user in pageData.content" :user="user" :key="user.id" />
+      </ul>
+    </template>
+    <template v-slot:footer>
       <Spinner v-if="apiProgress" size="normal" />
       <button
         class="btn btn-outline-secondary btn-sm float-start"
@@ -22,13 +24,13 @@
       >
         {{ $t('userList.next') }}
       </button>
-    </div>
-  </div>
+    </template>
+  </Card>
 </template>
 <script setup>
 import { loadUsers } from './api'
 import { onMounted, reactive, ref } from 'vue'
-import { Spinner } from '@/components'
+import { Card, Spinner } from '@/components'
 import UserItem from './UserItem.vue'
 
 const pageData = reactive({

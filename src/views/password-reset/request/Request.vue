@@ -1,24 +1,26 @@
 <template>
   <div class="col-lg-6 offset-lg-3 col-sm-8 offset-sm-2" data-testid="password-reset-request-page">
-    <form class="card" @submit.prevent="submit">
-      <div class="card-header text-center">
-        <h1>{{ $t('passwordReset.request') }}</h1>
-      </div>
-      <div class="card-body">
-        <AppInput id="e-mail" :label="$t('email')" :help="errors.email" v-model="email" />
-        <Alert v-if="errorMessage" variant="danger">{{ errorMessage }}</Alert>
-        <Alert v-if="successMessage">{{ successMessage }}</Alert>
-        <div class="text-center">
-          <AppButton :api-progress="apiProgress" :is-disabled="!email">
-            {{ $t('passwordReset.request') }}
-          </AppButton>
-        </div>
-      </div>
+    <form @submit.prevent="submit">
+      <Card>
+        <template v-slot:header>
+          <h1>{{ $t('passwordReset.request') }}</h1>
+        </template>
+        <template v-slot:body>
+          <AppInput id="e-mail" :label="$t('email')" :help="errors.email" v-model="email" />
+          <Alert v-if="errorMessage" variant="danger">{{ errorMessage }}</Alert>
+          <Alert v-if="successMessage">{{ successMessage }}</Alert>
+          <div class="text-center">
+            <AppButton :api-progress="apiProgress" :is-disabled="!email">
+              {{ $t('passwordReset.request') }}
+            </AppButton>
+          </div>
+        </template>
+      </Card>
     </form>
   </div>
 </template>
 <script setup>
-import { AppInput, AppButton, Alert } from '@/components'
+import { AppInput, AppButton, Alert, Card } from '@/components'
 import { ref, watch } from 'vue'
 import { passwordReset } from './api'
 import { useI18n } from 'vue-i18n'
