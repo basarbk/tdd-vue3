@@ -1,4 +1,5 @@
 vi.mock('@/views/activation/Activation.vue')
+vi.mock('@/views/home/components/UserList.vue')
 import { render, router, screen, waitFor } from 'test/helper'
 import App from './App.vue'
 
