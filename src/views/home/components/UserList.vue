@@ -8,16 +8,17 @@
         {{ user.username }}
       </li>
     </ul>
-    <div class="card-footer">
+    <div class="card-footer text-center">
+      <Spinner v-if="apiProgress" size="normal" />
       <button
-        class="btn btn-outline-secondary btn-sm"
+        class="btn btn-outline-secondary btn-sm float-start"
         @click="loadData(pageData.page - 1)"
         v-if="pageData.page !== 0"
       >
         {{ $t('userList.previous') }}
       </button>
       <button
-        class="btn btn-outline-secondary btn-sm"
+        class="btn btn-outline-secondary btn-sm float-end"
         @click="loadData(pageData.page + 1)"
         v-if="pageData.page + 1 < pageData.totalPages"
       >
@@ -28,7 +29,8 @@
 </template>
 <script setup>
 import { loadUsers } from './api'
-import { onMounted, reactive } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
+import { Spinner } from '@/components'
 
 const pageData = reactive({
   content: [],
@@ -37,11 +39,14 @@ const pageData = reactive({
   totalPages: 0
 })
 
+const apiProgress = ref(true)
+
 onMounted(() => {
   loadData()
 })
 
 const loadData = async (pageIndex) => {
+  apiProgress.value = true
   const {
     data: { content, page, size, totalPages }
   } = await loadUsers(pageIndex)
@@ -49,5 +54,6 @@ const loadData = async (pageIndex) => {
   pageData.page = page
   pageData.size = size
   pageData.totalPages = totalPages
+  apiProgress.value = false
 }
 </script>

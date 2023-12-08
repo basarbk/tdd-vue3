@@ -83,6 +83,29 @@ describe('UserList', () => {
     })
   })
 
+  describe('when api request is in progress', () => {
+    it('displays spinner', async () => {
+      let resolveFunc
+      const promise = new Promise((resolve) => {
+        resolveFunc = resolve
+      })
+      server.use(
+        http.get('/api/v1/users', async () => {
+          await promise
+          return HttpResponse.json(getPage(0, 3))
+        })
+      )
+      render(UserList)
+      await waitFor(() => {
+        expect(screen.queryByRole('status')).toBeInTheDocument()
+      })
+      await resolveFunc()
+      await waitFor(() => {
+        expect(screen.queryByRole('status')).not.toBeInTheDocument()
+      })
+    })
+  })
+
   it('displays next page button', async () => {
     render(UserList)
     await screen.findByText('user1')
