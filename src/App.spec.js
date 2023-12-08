@@ -89,6 +89,15 @@ describe('Routing', () => {
   })
 
   describe('when loging successful', () => {
+    const setupLoggedIn = async () => {
+      const { user } = await setup('/login')
+      await user.type(screen.getByLabelText('E-mail'), 'user1@mail.com')
+      await user.type(screen.getByLabelText('Password'), 'P4ssword')
+      await user.click(screen.getByRole('button', { name: 'Login' }))
+      await screen.findByTestId('home-page')
+      return { user }
+    }
+
     it('navigates to home page', async () => {
       const { user } = await setup('/login')
       await user.type(screen.getByLabelText('E-mail'), 'user1@mail.com')
@@ -96,6 +105,21 @@ describe('Routing', () => {
       await user.click(screen.getByRole('button', { name: 'Login' }))
       await waitFor(() => {
         expect(screen.queryByTestId('home-page')).toBeInTheDocument()
+      })
+    })
+
+    it('hides Login and Sign Up links', async () => {
+      await setupLoggedIn()
+      expect(screen.queryByTestId('link-signup-page')).not.toBeInTheDocument()
+      expect(screen.queryByTestId('link-login-page')).not.toBeInTheDocument()
+    })
+
+    describe('when user clicks My Profile', () => {
+      it('displays user page', async () => {
+        const { user } = await setupLoggedIn()
+        await user.click(screen.queryByTestId('link-my-profile'))
+        await screen.findByTestId('user-page')
+        expect(router.currentRoute.value.path).toBe('/user/1')
       })
     })
   })
