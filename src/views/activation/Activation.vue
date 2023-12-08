@@ -18,42 +18,15 @@ const { status, data, error } = useRouteParamApiRequest(activate, 'token')
 <!-- <script>
 import { activate } from './api'
 import { Alert, Spinner } from '@/components'
+import useRouteParamApiRequest from '@/shared/useRouteParamApiRequest'
 export default {
   components: {
     Alert,
     Spinner
   },
-  data() {
-    return {
-      error: '',
-      data: {},
-      status: ''
-    }
-  },
-  mounted() {
-    this.activationRequest()
-  },
-  methods: {
-    async activationRequest() {
-      this.status = 'loading'
-      try {
-        const response = await activate(this.$route.params.token)
-        this.data = response.data
-        this.status = 'success'
-      } catch (apiError) {
-        if (apiError.response?.data?.message) {
-          this.error = apiError.response.data.message
-        } else {
-          this.error = this.$t('genericError')
-        }
-        this.status = 'fail'
-      }
-    }
-  },
-  watch: {
-    '$route.params.token'() {
-      this.activationRequest()
-    }
+  setup() {
+    const { status, data, error } = useRouteParamApiRequest(activate, 'token')
+    return { status, data, error }
   }
 }
 </script> -->
