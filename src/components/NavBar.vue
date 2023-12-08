@@ -18,25 +18,49 @@
             }}</router-link>
           </li>
         </template>
-        <li class="nav-item" v-if="auth.id">
-          <router-link class="nav-link" :to="'/user/' + auth.id" data-testid="link-my-profile">
-            My Profile
-          </router-link>
-        </li>
+        <template v-if="auth.id">
+          <li class="nav-item">
+            <router-link class="nav-link" :to="'/user/' + auth.id" data-testid="link-my-profile">
+              My Profile
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <span class="nav-link" data-testid="link-logout" role="button" @click="logout">
+              {{ $t('logout') }}
+            </span>
+          </li>
+        </template>
       </ul>
     </div>
   </nav>
 </template>
 <script setup>
+import http from '@/lib/http'
 import { useAuthStore } from '@/stores/auth'
-const { auth } = useAuthStore()
+const { auth, logout: logoutStore } = useAuthStore()
+
+const logout = async () => {
+  logoutStore()
+  try {
+    await http.post('/api/v1/logout')
+  } catch {}
+}
 </script>
 <!-- <script>
+import http from '@/lib/http'
 import { useAuthStore } from '@/stores/auth'
 export default {
   setup() {
-    const { auth } = useAuthStore()
-    return { auth }
+    const { auth, logout } = useAuthStore()
+    return { auth, logoutStore: logout }
+  },
+  methods: {
+    async logout() {
+      this.logoutStore()
+      try {
+        await http.post('/api/v1/logout')
+      } catch {}
+    }
   }
 }
 </script> -->

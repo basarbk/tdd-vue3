@@ -16,5 +16,6 @@
     "next": "Sonraki",
     "previous": "Önceki"
   },
-  "login": "Oturum Aç"
+  "login": "Oturum Aç",
+  "logout": "Çıkış"
 }

@@ -16,5 +16,6 @@
     "next": "Next",
     "previous": "Previous"
   },
-  "login": "Login"
+  "login": "Login",
+  "logout": "Logout"
 }

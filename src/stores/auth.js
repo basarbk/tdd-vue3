@@ -21,9 +21,15 @@ export const useAuthStore = defineStore('auth', () => {
     auth.email = data.email
   }
 
+  function logout() {
+    auth.id = 0
+    delete auth.username
+    delete auth.email
+  }
+
   watch(auth, () => {
     localStorage.setItem('auth', JSON.stringify(auth))
   })
 
-  return { auth, setLoggedIn }
+  return { auth, setLoggedIn, logout }
 })

@@ -6,13 +6,19 @@ import App from './App.vue'
 import { setupServer } from 'msw/node'
 import { http, HttpResponse } from 'msw'
 
+let logoutCounter = 0
 const server = setupServer(
   http.post('/api/v1/auth', () => {
     return HttpResponse.json({ id: 1, username: 'user1', email: 'user1@mail.com', image: null })
+  }),
+  http.post('/api/v1/logout', () => {
+    logoutCounter += 1
+    return HttpResponse.json({})
   })
 )
 
 beforeEach(() => {
+  logoutCounter = 0
   server.resetHandlers()
 })
 
@@ -132,15 +138,35 @@ describe('Routing', () => {
   })
 
   describe('when local storage has auth data', () => {
-    it('displays logged in layout', async () => {
+    beforeEach(() => {
       localStorage.setItem(
         'auth',
         JSON.stringify({ id: 1, username: 'user1', email: 'user1@mail.com' })
       )
+    })
+    it('displays logged in layout', async () => {
       await setup('/')
       expect(screen.queryByTestId('link-signup-page')).not.toBeInTheDocument()
       expect(screen.queryByTestId('link-login-page')).not.toBeInTheDocument()
       expect(screen.queryByTestId('link-my-profile')).toBeInTheDocument()
+    })
+
+    describe('when user clicks Logout', () => {
+      it('displays Login and Sign Up links', async () => {
+        const { user } = await setup('/')
+        await user.click(screen.queryByTestId('link-logout'))
+        expect(screen.queryByTestId('link-signup-page')).toBeInTheDocument()
+        expect(screen.queryByTestId('link-login-page')).toBeInTheDocument()
+        expect(screen.queryByTestId('link-my-profile')).not.toBeInTheDocument()
+      })
+
+      it('sends logout request to server', async () => {
+        const { user } = await setup('/')
+        await user.click(screen.queryByTestId('link-logout'))
+        await waitFor(() => {
+          expect(logoutCounter).toBe(1)
+        })
+      })
     })
   })
 })
