@@ -22,17 +22,16 @@
         <Alert v-if="errorMessage" variant="danger">{{ errorMessage }}</Alert>
         <Alert v-if="successMessage">{{ successMessage }}</Alert>
         <div class="text-center">
-          <button class="btn btn-primary" :disabled="isDisabled || apiProgress">
-            <Spinner v-if="apiProgress" />
+          <AppButton :is-disabled="isDisabled" :api-progress="apiProgress">
             {{ $t('passwordReset.set') }}
-          </button>
+          </AppButton>
         </div>
       </div>
     </form>
   </div>
 </template>
 <script setup>
-import { AppInput, Spinner, Alert } from '@/components'
+import { AppInput, Alert, AppButton } from '@/components'
 import { computed, ref, watch } from 'vue'
 import { passwordSet } from './api'
 import { useI18n } from 'vue-i18n'

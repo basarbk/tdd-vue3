@@ -28,19 +28,18 @@
         />
         <Alert v-if="errorMessage" variant="danger">{{ errorMessage }}</Alert>
         <div class="text-center">
-          <button class="btn btn-primary" :disabled="isDisabled || apiProgress">
-            <Spinner v-if="apiProgress" />
+          <AppButton :is-disabled="isDisabled" :api-progress="apiProgress">
             {{ $t('signUp') }}
-          </button>
+          </AppButton>
         </div>
       </div>
     </form>
     <Alert v-else>{{ successMessage }}</Alert>
   </div>
 </template>
-<!-- <script setup>
+<script setup>
 import { reactive, computed, ref, watch } from 'vue'
-import { Alert, AppInput, Spinner } from '@/components'
+import { Alert, AppInput, AppButton } from '@/components'
 import { useI18n } from 'vue-i18n'
 import { signUp } from './api'
 const { t } = useI18n()
@@ -102,16 +101,16 @@ watch(
     delete errors.value.password
   }
 )
-</script> -->
-<script>
-import { Alert, AppInput, Spinner } from '@/components'
+</script>
+<!-- <script>
+import { Alert, AppInput, AppButton } from '@/components'
 import { signUp } from './api'
 
 export default {
   components: {
     AppInput,
     Alert,
-    Spinner
+    AppButton
   },
   data() {
     return {
@@ -170,4 +169,4 @@ export default {
     }
   }
 }
-</script>
+</script> -->
