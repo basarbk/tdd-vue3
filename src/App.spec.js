@@ -3,6 +3,22 @@ vi.mock('@/views/home/components/UserList.vue')
 vi.mock('@/views/user/User.vue')
 import { render, router, screen, waitFor } from 'test/helper'
 import App from './App.vue'
+import { setupServer } from 'msw/node'
+import { http, HttpResponse } from 'msw'
+
+const server = setupServer(
+  http.post('/api/v1/auth', () => {
+    return HttpResponse.json({ id: 1, username: 'user1', email: 'user1@mail.com', image: null })
+  })
+)
+
+beforeEach(() => {
+  server.resetHandlers()
+})
+
+beforeAll(() => server.listen())
+
+afterAll(() => server.close())
 
 const setup = async (path) => {
   router.push(path)
@@ -68,6 +84,18 @@ describe('Routing', () => {
         await waitFor(() => {
           expect(screen.queryByTestId('password-reset-request-page')).toBeInTheDocument()
         })
+      })
+    })
+  })
+
+  describe('when loging successful', () => {
+    it('navigates to home page', async () => {
+      const { user } = await setup('/login')
+      await user.type(screen.getByLabelText('E-mail'), 'user1@mail.com')
+      await user.type(screen.getByLabelText('Password'), 'P4ssword')
+      await user.click(screen.getByRole('button', { name: 'Login' }))
+      await waitFor(() => {
+        expect(screen.queryByTestId('home-page')).toBeInTheDocument()
       })
     })
   })

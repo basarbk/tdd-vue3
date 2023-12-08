@@ -38,7 +38,10 @@ import { AppInput, Alert, Card, AppButton } from '@/components'
 import { ref, computed, reactive, watch } from 'vue'
 import { login } from './api'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 const { t } = useI18n()
+
+const router = useRouter()
 
 const formState = reactive({ email: '', password: '' })
 const apiProgress = ref(false)
@@ -50,6 +53,7 @@ const submit = async () => {
   errorMessage.value = undefined
   try {
     await login(formState)
+    router.push('/')
   } catch (apiError) {
     if (apiError.response?.status === 400) {
       errors.value = apiError.response.data.validationErrors
