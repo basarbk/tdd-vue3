@@ -4,9 +4,7 @@
       <h3>{{ $t('userList.header') }}</h3>
     </div>
     <ul class="list-group list-group-flush">
-      <li class="list-group-item list-group-item-action" v-for="user in pageData.content">
-        {{ user.username }}
-      </li>
+      <UserItem v-for="user in pageData.content" :user="user" />
     </ul>
     <div class="card-footer text-center">
       <Spinner v-if="apiProgress" size="normal" />
@@ -31,6 +29,7 @@
 import { loadUsers } from './api'
 import { onMounted, reactive, ref } from 'vue'
 import { Spinner } from '@/components'
+import UserItem from './UserItem.vue'
 
 const pageData = reactive({
   content: [],
