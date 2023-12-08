@@ -13,7 +13,8 @@ describe('Routing', () => {
     { path: '/', pageId: 'home-page' },
     { path: '/signup', pageId: 'signup-page' },
     { path: '/activation/123', pageId: 'activation-page' },
-    { path: '/activation/456', pageId: 'activation-page' }
+    { path: '/activation/456', pageId: 'activation-page' },
+    { path: '/password-reset/request', pageId: 'password-reset-request-page' }
   ])('when path is $path', ({ path, pageId }) => {
     it(`displays ${pageId}`, async () => {
       await setup(path)
