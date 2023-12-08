@@ -14,5 +14,6 @@
     "header": "Users",
     "next": "Next",
     "previous": "Previous"
-  }
+  },
+  "login": "Login"
 }
