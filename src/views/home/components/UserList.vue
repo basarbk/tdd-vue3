@@ -4,7 +4,7 @@
       <h3>{{ $t('userList.header') }}</h3>
     </div>
     <ul class="list-group list-group-flush">
-      <UserItem v-for="user in pageData.content" :user="user" />
+      <UserItem v-for="user in pageData.content" :user="user" :key="user.id" />
     </ul>
     <div class="card-footer text-center">
       <Spinner v-if="apiProgress" size="normal" />
