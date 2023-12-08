@@ -1,8 +1,8 @@
 import { render, waitFor, router, screen } from 'test/helper'
 import { setupServer } from 'msw/node'
-import { HttpResponse, http } from 'msw'
-import { afterAll, beforeAll } from 'vitest'
+import { HttpResponse, delay, http } from 'msw'
 import Activation from './Activation.vue'
+import { i18n } from '@/locales'
 let counter = 0
 let token
 const server = setupServer(
@@ -136,4 +136,25 @@ describe('Activation', () => {
       expect(spinner).not.toBeInTheDocument()
     })
   })
+
+  describe.each([{ language: 'tr' }, { language: 'en' }])(
+    'when langauge is $language',
+    ({ language }) => {
+      it('sends expected language in accept language header', async () => {
+        i18n.global.locale = language
+        let acceptLanguage
+        server.use(
+          http.patch('/api/v1/users/:token/active', async ({ request }) => {
+            acceptLanguage = request.headers.get('Accept-Language')
+            await delay('infinite')
+            return HttpResponse.json({})
+          })
+        )
+        await setup('/activation/123')
+        await waitFor(() => {
+          expect(acceptLanguage).toBe(language)
+        })
+      })
+    }
+  )
 })
