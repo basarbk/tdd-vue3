@@ -21,7 +21,13 @@
         <template v-if="auth.id">
           <li class="nav-item">
             <router-link class="nav-link" :to="'/user/' + auth.id" data-testid="link-my-profile">
-              My Profile
+              <img
+                src="@/assets/profile.png"
+                :alt="auth.username + ' profile'"
+                width="30"
+                class="rounded-circle shadow-sm"
+              />
+              {{ auth.username }}
             </router-link>
           </li>
           <li class="nav-item">
