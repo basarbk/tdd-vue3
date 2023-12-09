@@ -11,17 +11,30 @@
     </template>
     <template v-slot:body>
       <div class="text-center">
-        <h3>{{ user.username }}</h3>
-        <UserDeleteButton :id="user.id" />
+        <template v-if="!editMode">
+          <h3>{{ user.username }}</h3>
+          <AppButton v-if="auth.id === user.id" @click="editMode = !editMode">{{
+            $t('edit')
+          }}</AppButton>
+          <div class="mt-3"></div>
+          <UserDeleteButton :id="user.id" />
+        </template>
+        <EditForm v-if="editMode" @cancel="editMode = false" />
       </div>
     </template>
   </Card>
 </template>
 <script setup>
-import { Card } from '@/components'
+import { AppButton, Card } from '@/components'
 import UserDeleteButton from './UserDeleteButton.vue'
+import { useAuthStore } from '@/stores/auth'
+import EditForm from './EditForm.vue'
+import { ref } from 'vue'
 
 defineProps({
   user: Object
 })
+
+const editMode = ref(false)
+const { auth } = useAuthStore()
 </script>

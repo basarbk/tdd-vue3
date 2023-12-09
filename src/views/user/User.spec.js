@@ -172,7 +172,8 @@ describe('User Page', () => {
       const result = await setup(`/user/${id}`)
       await screen.findByText(`user${id}`)
       const deleteButton = screen.queryByRole('button', { name: 'Delete' })
-      return { ...result, elements: { deleteButton } }
+      const editButton = screen.queryByRole('button', { name: 'Edit' })
+      return { ...result, elements: { deleteButton, editButton } }
     }
 
     beforeEach(() => {
@@ -184,6 +185,91 @@ describe('User Page', () => {
           elements: { deleteButton }
         } = await setupPageLoaded()
         expect(deleteButton).toBeInTheDocument()
+      })
+
+      it('displays edit button', async () => {
+        const {
+          elements: { editButton }
+        } = await setupPageLoaded()
+        expect(editButton).toBeInTheDocument()
+      })
+
+      describe('when user clicks edit button', () => {
+        it('displays username input', async () => {
+          const {
+            user,
+            elements: { editButton }
+          } = await setupPageLoaded()
+          await user.click(editButton)
+          expect(screen.getByLabelText('Username')).toBeInTheDocument()
+        })
+        it('hides edit button', async () => {
+          const {
+            user,
+            elements: { editButton }
+          } = await setupPageLoaded()
+          await user.click(editButton)
+          expect(editButton).not.toBeInTheDocument()
+        })
+
+        it('hides delete button', async () => {
+          const {
+            user,
+            elements: { editButton, deleteButton }
+          } = await setupPageLoaded()
+          await user.click(editButton)
+          expect(deleteButton).not.toBeInTheDocument()
+        })
+
+        it('hides username', async () => {
+          const {
+            user,
+            elements: { editButton }
+          } = await setupPageLoaded()
+          await user.click(editButton)
+          expect(screen.queryByText('user3')).not.toBeInTheDocument()
+        })
+
+        it('sets username as initial value for input', async () => {
+          const {
+            user,
+            elements: { editButton }
+          } = await setupPageLoaded()
+          await user.click(editButton)
+          expect(screen.getByLabelText('Username')).toHaveValue('user3')
+        })
+
+        it('displays save button', async () => {
+          const {
+            user,
+            elements: { editButton }
+          } = await setupPageLoaded()
+          await user.click(editButton)
+          expect(screen.queryByRole('button', { name: 'Save' })).toBeInTheDocument()
+        })
+
+        it('displays cancel button', async () => {
+          const {
+            user,
+            elements: { editButton }
+          } = await setupPageLoaded()
+          await user.click(editButton)
+          expect(screen.queryByRole('button', { name: 'Cancel' })).toBeInTheDocument()
+        })
+
+        describe('when user clicks cancel', () => {
+          it('displays username', async () => {
+            const {
+              user,
+              elements: { editButton }
+            } = await setupPageLoaded()
+            await user.click(editButton)
+            await user.click(screen.queryByRole('button', { name: 'Cancel' }))
+            await waitFor(() => {
+              expect(screen.queryByText('user3')).toBeInTheDocument()
+            })
+          })
+        })
       })
 
       describe('when user clicks delete button', () => {
@@ -358,6 +444,13 @@ describe('User Page', () => {
           elements: { deleteButton }
         } = await setupPageLoaded('1')
         expect(deleteButton).not.toBeInTheDocument()
+      })
+
+      it('does not display edit button', async () => {
+        const {
+          elements: { editButton }
+        } = await setupPageLoaded('1')
+        expect(editButton).not.toBeInTheDocument()
       })
     })
   })
