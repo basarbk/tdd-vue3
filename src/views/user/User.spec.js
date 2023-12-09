@@ -382,6 +382,119 @@ describe('User Page', () => {
               })
             })
           })
+
+          describe('when network failure occurs', () => {
+            it('displays message generic error message', async () => {
+              server.use(
+                http.put('/api/v1/users/:id', () => {
+                  return HttpResponse.error()
+                })
+              )
+              const {
+                user,
+                elements: { editButton }
+              } = await setupPageLoaded()
+              await user.click(editButton)
+              await user.click(screen.getByRole('button', { name: 'Save' }))
+              const text = await screen.findByText('Unexpected error occurred, please try again')
+              expect(text).toBeInTheDocument()
+            })
+
+            it('hides spinner', async () => {
+              server.use(
+                http.put('/api/v1/users/:id', () => {
+                  return HttpResponse.error()
+                })
+              )
+              const {
+                user,
+                elements: { editButton }
+              } = await setupPageLoaded()
+              await user.click(editButton)
+              await user.click(screen.getByRole('button', { name: 'Save' }))
+              await waitFor(() => {
+                expect(screen.queryByRole('status')).not.toBeInTheDocument()
+              })
+            })
+
+            describe('when user submits again', () => {
+              it('hides error when api request in progress', async () => {
+                let processedFirstRequest = false
+                server.use(
+                  http.put('/api/v1/users/:id', async () => {
+                    if (!processedFirstRequest) {
+                      processedFirstRequest = true
+                      return HttpResponse.error()
+                    } else {
+                      await delay('infinite')
+                      return HttpResponse.json({})
+                    }
+                  })
+                )
+                const {
+                  user,
+                  elements: { editButton }
+                } = await setupPageLoaded()
+                await user.click(editButton)
+                await user.click(screen.getByRole('button', { name: 'Save' }))
+                await screen.findByText('Unexpected error occurred, please try again')
+                await user.click(screen.getByRole('button', { name: 'Save' }))
+                await waitFor(() => {
+                  expect(
+                    screen.queryByText('Unexpected error occurred, please try again')
+                  ).not.toBeInTheDocument()
+                })
+              })
+            })
+
+            describe('when username is invalid', () => {
+              it('displays validation error', async () => {
+                server.use(
+                  http.put('/api/v1/users/:id', () => {
+                    return HttpResponse.json(
+                      {
+                        validationErrors: {
+                          username: 'Username cannot be null'
+                        }
+                      },
+                      { status: 400 }
+                    )
+                  })
+                )
+                const {
+                  user,
+                  elements: { editButton }
+                } = await setupPageLoaded()
+                await user.click(editButton)
+                await user.click(screen.getByRole('button', { name: 'Save' }))
+                const validationError = await screen.findByText('Username cannot be null')
+                expect(validationError).toBeInTheDocument()
+              })
+              it('clears validation error after username field is updated', async () => {
+                server.use(
+                  http.put('/api/v1/users/:id', () => {
+                    return HttpResponse.json(
+                      {
+                        validationErrors: {
+                          username: 'Username cannot be null'
+                        }
+                      },
+                      { status: 400 }
+                    )
+                  })
+                )
+                const {
+                  user,
+                  elements: { editButton }
+                } = await setupPageLoaded()
+                await user.click(editButton)
+                await user.click(screen.getByRole('button', { name: 'Save' }))
+                const validationError = await screen.findByText('Username cannot be null')
+                await user.type(screen.getByLabelText('Username'), '-updated')
+                expect(validationError).not.toBeInTheDocument()
+              })
+            })
+          })
         })
       })
 
