@@ -12,14 +12,14 @@
     <template v-slot:body>
       <div class="text-center">
         <template v-if="!editMode">
-          <h3>{{ user.username }}</h3>
+          <h3>{{ username }}</h3>
           <AppButton v-if="auth.id === user.id" @click="editMode = !editMode">{{
             $t('edit')
           }}</AppButton>
           <div class="mt-3"></div>
           <UserDeleteButton :id="user.id" />
         </template>
-        <EditForm v-if="editMode" @cancel="editMode = false" />
+        <EditForm v-if="editMode" @cancel="editMode = false" @save="editMode = false" />
       </div>
     </template>
   </Card>
@@ -29,12 +29,13 @@ import { AppButton, Card } from '@/components'
 import UserDeleteButton from './UserDeleteButton.vue'
 import { useAuthStore } from '@/stores/auth'
 import EditForm from './EditForm.vue'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
-defineProps({
+const props = defineProps({
   user: Object
 })
 
 const editMode = ref(false)
 const { auth } = useAuthStore()
+const username = computed(() => (auth.id === props.user.id ? auth.username : props.user.username))
 </script>

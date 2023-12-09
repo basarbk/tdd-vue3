@@ -1,14 +1,27 @@
 <template>
-  <AppInput id="username" :label="$t('username')" v-model="auth.username" />
-  <AppButton>{{ $t('save') }}</AppButton>
-  <div class="d-inline m-1"></div>
-  <AppButton variant="outline-secondary" @click="$emit('cancel')">{{ $t('cancel') }}</AppButton>
+  <form @submit.prevent="submit">
+    <AppInput id="username" :label="$t('username')" v-model="auth.username" />
+    <AppButton type="submit" :api-progress="apiProgress">{{ $t('save') }}</AppButton>
+    <div class="d-inline m-1"></div>
+    <AppButton type="button" variant="outline-secondary" @click="$emit('cancel')">{{
+      $t('cancel')
+    }}</AppButton>
+  </form>
 </template>
 <script setup>
 import { AppButton, AppInput } from '@/components'
 import { useAuthStore } from '@/stores/auth'
+import { updateUser } from './api'
+import { ref } from 'vue'
 
-defineEmits(['cancel'])
+const emit = defineEmits(['cancel', 'save'])
 
 const { auth } = useAuthStore()
+const apiProgress = ref(false)
+
+const submit = async () => {
+  apiProgress.value = true
+  await updateUser(auth.id, { username: auth.username })
+  emit('save')
+}
 </script>
