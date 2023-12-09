@@ -12,12 +12,15 @@
     <template v-slot:body>
       <div class="text-center">
         <h3>{{ user.username }}</h3>
+        <UserDeleteButton :id="user.id" />
       </div>
     </template>
   </Card>
 </template>
 <script setup>
 import { Card } from '@/components'
+import UserDeleteButton from './UserDeleteButton.vue'
+
 defineProps({
   user: Object
 })

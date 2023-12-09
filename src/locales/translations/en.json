@@ -17,5 +17,9 @@
     "previous": "Previous"
   },
   "login": "Login",
-  "logout": "Logout"
+  "logout": "Logout",
+  "deleteUser": {
+    "button": "Delete",
+    "confirm": "Are you sure?"
+  }
 }

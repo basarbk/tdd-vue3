@@ -17,5 +17,9 @@
     "previous": "Önceki"
   },
   "login": "Oturum Aç",
-  "logout": "Çıkış"
+  "logout": "Çıkış",
+  "deleteUser": {
+    "button": "Sil",
+    "confirm": "Emin misin?"
+  }
 }

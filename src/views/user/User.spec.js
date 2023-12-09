@@ -1,7 +1,7 @@
 import { render, waitFor, router, screen } from 'test/helper'
 import User from './User.vue'
 import { setupServer } from 'msw/node'
-import { http, HttpResponse } from 'msw'
+import { delay, http, HttpResponse } from 'msw'
 import { i18n } from '@/locales'
 
 let counter = 0
@@ -10,7 +10,12 @@ const server = setupServer(
   http.get('/api/v1/users/:id', async ({ params }) => {
     counter += 1
     id = params.id
-    return HttpResponse.json({ id: 1, username: 'user1', email: 'user1@mail.com', image: null })
+    return HttpResponse.json({
+      id: Number(id),
+      username: `user${id}`,
+      email: `user${id}@mail.com`,
+      image: null
+    })
   })
 )
 
@@ -23,6 +28,8 @@ beforeEach(() => {
 })
 
 afterAll(() => server.close())
+
+const confirmSpy = vi.spyOn(window, 'confirm')
 
 const setup = async (path) => {
   router.push(path)
@@ -159,4 +166,199 @@ describe('User Page', () => {
       })
     }
   )
+
+  describe('when there is logged in user', () => {
+    const setupPageLoaded = async (id = '3') => {
+      const result = await setup(`/user/${id}`)
+      await screen.findByText(`user${id}`)
+      const deleteButton = screen.queryByRole('button', { name: 'Delete' })
+      return { ...result, elements: { deleteButton } }
+    }
+
+    beforeEach(() => {
+      localStorage.setItem('auth', JSON.stringify({ id: 3, username: 'user3' }))
+    })
+    describe('when user id matches to logged in user id', () => {
+      it('displays delete button', async () => {
+        const {
+          elements: { deleteButton }
+        } = await setupPageLoaded()
+        expect(deleteButton).toBeInTheDocument()
+      })
+
+      describe('when user clicks delete button', () => {
+        beforeEach(() => {
+          confirmSpy.mockReturnValue(false)
+        })
+        it('displays confirm dialog', async () => {
+          const {
+            user,
+            elements: { deleteButton }
+          } = await setupPageLoaded()
+          await user.click(deleteButton)
+          expect(confirmSpy).toHaveBeenCalledWith('Are you sure?')
+        })
+        describe('when user confirms', () => {
+          beforeEach(() => {
+            confirmSpy.mockReturnValueOnce(true)
+          })
+          it('sends delete request to backend', async () => {
+            let id
+            server.use(
+              http.delete('/api/v1/users/:id', async ({ params }) => {
+                id = params.id
+                return HttpResponse.json({})
+              })
+            )
+            const {
+              user,
+              elements: { deleteButton }
+            } = await setupPageLoaded()
+            await user.click(deleteButton)
+            await waitFor(() => {
+              expect(id).toBe('3')
+            })
+          })
+
+          describe('when api request in progress', () => {
+            it('displays spinner', async () => {
+              server.use(
+                http.delete('/api/v1/users/:id', async () => {
+                  await delay('infinite')
+                  return HttpResponse.json({})
+                })
+              )
+              const {
+                user,
+                elements: { deleteButton }
+              } = await setupPageLoaded()
+              expect(screen.queryByRole('status')).not.toBeInTheDocument()
+              await user.click(deleteButton)
+              await waitFor(() => {
+                expect(screen.queryByRole('status')).toBeInTheDocument()
+              })
+            })
+          })
+          describe('when result is success', () => {
+            it('navigates to home', async () => {
+              server.use(
+                http.delete('/api/v1/users/:id', async () => {
+                  return HttpResponse.json({})
+                })
+              )
+              const {
+                user,
+                elements: { deleteButton }
+              } = await setupPageLoaded()
+              await user.click(deleteButton)
+              await waitFor(() => {
+                expect(router.currentRoute.value.path).toBe('/')
+              })
+            })
+
+            it('should log user out', async () => {
+              server.use(
+                http.delete('/api/v1/users/:id', async () => {
+                  return HttpResponse.json({})
+                })
+              )
+              const {
+                user,
+                elements: { deleteButton }
+              } = await setupPageLoaded()
+              await user.click(deleteButton)
+              await waitFor(() => {
+                expect(JSON.parse(localStorage.getItem('auth')).id).toBe(0)
+              })
+            })
+          })
+
+          describe('when result is error', () => {
+            it('displays generic error message', async () => {
+              server.use(
+                http.delete('/api/v1/users/:id', async () => {
+                  return HttpResponse.error()
+                })
+              )
+              const {
+                user,
+                elements: { deleteButton }
+              } = await setupPageLoaded()
+              await user.click(deleteButton)
+              await waitFor(() => {
+                expect(
+                  screen.queryByText('Unexpected error occurred, please try again')
+                ).toBeInTheDocument()
+              })
+            })
+
+            it('hides spinner', async () => {
+              server.use(
+                http.delete('/api/v1/users/:id', async () => {
+                  return HttpResponse.error()
+                })
+              )
+              const {
+                user,
+                elements: { deleteButton }
+              } = await setupPageLoaded()
+              await user.click(deleteButton)
+              await screen.findByText('Unexpected error occurred, please try again')
+              expect(screen.queryByRole('status')).not.toBeInTheDocument()
+            })
+            describe('when user clicks again', () => {
+              it('hides error message', async () => {
+                let processedFirstRequest = false
+                server.use(
+                  http.delete('/api/v1/users/:id', async () => {
+                    if (!processedFirstRequest) {
+                      return HttpResponse.error()
+                    } else {
+                      await delay('infinite')
+                      return HttpResponse.json({})
+                    }
+                  })
+                )
+                const {
+                  user,
+                  elements: { deleteButton }
+                } = await setupPageLoaded()
+                await user.click(deleteButton)
+                const error = await screen.findByText('Unexpected error occurred, please try again')
+                await user.click(deleteButton)
+                expect(error).not.toBeInTheDocument()
+              })
+            })
+          })
+        })
+
+        describe('when user cancels', () => {
+          it('stays on profile page', async () => {
+            server.use(
+              http.delete('/api/v1/users/:id', async () => {
+                return HttpResponse.json({})
+              })
+            )
+            const {
+              user,
+              elements: { deleteButton }
+            } = await setupPageLoaded()
+            await user.click(deleteButton)
+            await waitFor(() => {
+              expect(router.currentRoute.value.path).toBe('/user/3')
+            })
+          })
+        })
+      })
+    })
+
+    describe('when user id do not match to logged in user id', () => {
+      it('does not display delete button', async () => {
+        const {
+          elements: { deleteButton }
+        } = await setupPageLoaded('1')
+        expect(deleteButton).not.toBeInTheDocument()
+      })
+    })
+  })
 })
