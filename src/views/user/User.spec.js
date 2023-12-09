@@ -257,6 +257,23 @@ describe('User Page', () => {
           expect(screen.queryByRole('button', { name: 'Cancel' })).toBeInTheDocument()
         })
 
+        describe('when username is changed', () => {
+          describe('when user clicks cancel', () => {
+            it('displays initial username', async () => {
+              const {
+                user,
+                elements: { editButton }
+              } = await setupPageLoaded()
+              await user.click(editButton)
+              await user.type(screen.getByLabelText('Username'), '-updated')
+              await user.click(screen.queryByRole('button', { name: 'Cancel' }))
+              await waitFor(() => {
+                expect(screen.queryByText('user3')).toBeInTheDocument()
+              })
+            })
+          })
+        })
+
         describe('when user clicks cancel', () => {
           it('displays username', async () => {
             const {
