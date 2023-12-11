@@ -7,7 +7,7 @@ export default mergeConfig(
   defineConfig({
     test: {
       environment: 'jsdom',
-      exclude: [...configDefaults.exclude, 'e2e/*'],
+      exclude: [...configDefaults.exclude, 'e2e/*', '**/*.unit.*'],
       root: fileURLToPath(new URL('./', import.meta.url)),
       globals: true,
       setupFiles: ['./setupTest.js'],
