@@ -26,13 +26,14 @@ const error = ref()
 const errors = ref({})
 const apiProgress = ref(false)
 const username = ref(auth.username)
+const image = ref()
 
 const submit = async () => {
   apiProgress.value = true
   error.value = undefined
   try {
-    await updateUser(auth.id, { username: username.value })
-    update({ username: username.value })
+    const result = await updateUser(auth.id, { username: username.value, image: image.value })
+    update({ username: username.value, image: result.data.image })
     emit('save')
   } catch (apiError) {
     apiProgress.value = false
@@ -49,6 +50,7 @@ const onImageChange = (event) => {
   const fileReader = new FileReader()
   fileReader.onloadend = () => {
     const data = fileReader.result
+    image.value = data.split(',')[1]
     emit('newImage', data)
   }
   fileReader.readAsDataURL(file)

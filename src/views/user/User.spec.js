@@ -360,7 +360,7 @@ describe('User Page', () => {
           it('sends request with updated username', async () => {
             let requestBody
             server.use(
-              http.put('/api/v1/users/:id', async ({ request, params }) => {
+              http.put('/api/v1/users/:id', async ({ request }) => {
                 requestBody = await request.json()
                 return HttpResponse.json({})
               })
@@ -374,6 +374,31 @@ describe('User Page', () => {
             await user.click(screen.getByRole('button', { name: 'Save' }))
             await waitFor(() => {
               expect(requestBody).toStrictEqual({ username: 'user3-updated' })
+            })
+          })
+
+          it('sends request with image', async () => {
+            let requestBody
+            server.use(
+              http.put('/api/v1/users/:id', async ({ request }) => {
+                requestBody = await request.json()
+                return HttpResponse.json({})
+              })
+            )
+            const {
+              user,
+              elements: { editButton }
+            } = await setupPageLoaded()
+            await user.click(editButton)
+            const fileUploadInput = screen.getByLabelText('Select Image')
+            await user.upload(
+              fileUploadInput,
+              new File(['hello'], 'hello.png', { type: 'image/png' })
+            )
+
+            await user.click(screen.getByRole('button', { name: 'Save' }))
+            await waitFor(() => {
+              expect(requestBody).toStrictEqual({ username: 'user3', image: 'aGVsbG8=' })
             })
           })
           describe('when api request in progress', () => {
@@ -429,6 +454,29 @@ describe('User Page', () => {
               await waitFor(() => {
                 expect(screen.getByText('user3-updated')).toBeInTheDocument()
               })
+            })
+
+            it('displays image served from backend', async () => {
+              server.use(
+                http.put('/api/v1/users/:id', () => {
+                  return HttpResponse.json({ username: 'user3', image: 'uploaded-image.png' })
+                })
+              )
+              const {
+                user,
+                elements: { editButton }
+              } = await setupPageLoaded()
+              await user.click(editButton)
+              const fileUploadInput = screen.getByLabelText('Select Image')
+              await user.upload(
+                fileUploadInput,
+                new File(['hello'], 'hello.png', { type: 'image/png' })
+              )
+
+              await user.click(screen.getByRole('button', { name: 'Save' }))
+              await screen.findByText('user3')
+              const image = screen.getByAltText('user3 profile')
+              expect(image).toHaveAttribute('src', '/images/uploaded-image.png')
             })
           })
 
