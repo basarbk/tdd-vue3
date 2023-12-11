@@ -1,7 +1,13 @@
 <template>
   <form @submit.prevent="submit">
     <AppInput id="username" :label="$t('username')" v-model="username" :help="errors.username" />
-    <AppInput id="image" :label="$t('selectImage')" type="file" @change="onImageChange" />
+    <AppInput
+      id="image"
+      :label="$t('selectImage')"
+      type="file"
+      @change="onImageChange"
+      :help="errors.image"
+    />
     <Alert v-if="error" variant="danger">{{ error }}</Alert>
     <AppButton type="submit" :api-progress="apiProgress">{{ $t('save') }}</AppButton>
     <div class="d-inline m-1"></div>
@@ -46,6 +52,7 @@ const submit = async () => {
 }
 
 const onImageChange = (event) => {
+  delete errors.value.image
   const file = event.target.files[0]
   const fileReader = new FileReader()
   fileReader.onloadend = () => {
