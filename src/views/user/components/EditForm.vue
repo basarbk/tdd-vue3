@@ -1,6 +1,7 @@
 <template>
   <form @submit.prevent="submit">
     <AppInput id="username" :label="$t('username')" v-model="username" :help="errors.username" />
+    <AppInput id="image" :label="$t('selectImage')" type="file" @change="onImageChange" />
     <Alert v-if="error" variant="danger">{{ error }}</Alert>
     <AppButton type="submit" :api-progress="apiProgress">{{ $t('save') }}</AppButton>
     <div class="d-inline m-1"></div>
@@ -16,7 +17,7 @@ import { updateUser } from './api'
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-const emit = defineEmits(['cancel', 'save'])
+const emit = defineEmits(['cancel', 'save', 'newImage'])
 
 const { t } = useI18n()
 const { auth, update } = useAuthStore()
@@ -42,6 +43,17 @@ const submit = async () => {
     }
   }
 }
+
+const onImageChange = (event) => {
+  const file = event.target.files[0]
+  const fileReader = new FileReader()
+  fileReader.onloadend = () => {
+    const data = fileReader.result
+    emit('newImage', data)
+  }
+  fileReader.readAsDataURL(file)
+}
+
 watch(
   () => username.value,
   () => {
