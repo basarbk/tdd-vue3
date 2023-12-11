@@ -21,11 +21,12 @@
         <template v-if="auth.id">
           <li class="nav-item">
             <router-link class="nav-link" :to="'/user/' + auth.id" data-testid="link-my-profile">
-              <img
-                src="@/assets/profile.png"
+              <ProfileImage
                 :alt="auth.username + ' profile'"
                 width="30"
+                height="30"
                 class="rounded-circle shadow-sm"
+                :image="auth.image"
               />
               {{ auth.username }}
             </router-link>
@@ -42,6 +43,7 @@
 </template>
 <script setup>
 import http from '@/lib/http'
+import { ProfileImage } from './index'
 import { useAuthStore } from '@/stores/auth'
 const { auth, logout: logoutStore } = useAuthStore()
 
@@ -55,7 +57,11 @@ const logout = async () => {
 <!-- <script>
 import http from '@/lib/http'
 import { useAuthStore } from '@/stores/auth'
+import ProfileImage from './ProfileImage.vue'
 export default {
+  components: {
+    ProfileImage
+  },
   setup() {
     const { auth, logout } = useAuthStore()
     return { auth, logoutStore: logout }
